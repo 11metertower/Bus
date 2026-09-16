@@ -15,6 +15,8 @@ from typing import Dict, Iterable, List, Tuple
 import numpy as np
 import pandas as pd
 
+from .config import BASELINE_FEATURE_WEIGHTS
+
 
 OBJECTIVE_FEATURES = [
     "support_score",
@@ -31,20 +33,8 @@ OBJECTIVE_FEATURES = [
     "diversity_score",
 ]
 
-INITIAL_WEIGHTS = {
-    "support_score": 0.22,
-    "weighted_support_score": 0.16,
-    "vehicle_fit_norm": 0.09,
-    "driver_fit_norm": 0.09,
-    "fairness_score": 0.09,
-    "fatigue_score": 0.08,
-    "vehicle_preservation_score": 0.07,
-    "other_handling_score": 0.06,
-    "expert_vehicle_match_rate": 0.05,
-    "expert_driver_match_rate": 0.05,
-    "expert_other_match_rate": 0.03,
-    "diversity_score": 0.01,
-}
+# The inverse-optimization prior is the shared expert-designed baseline.
+INITIAL_WEIGHTS = BASELINE_FEATURE_WEIGHTS
 
 
 @dataclass

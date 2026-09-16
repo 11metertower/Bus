@@ -21,7 +21,7 @@ from sklearn.ensemble import GradientBoostingRegressor, RandomForestRegressor
 from sklearn.metrics import mean_absolute_error, r2_score
 from sklearn.model_selection import KFold, cross_val_predict
 
-from .config import OUTPUTS_DIR, PROCESSED_DIR, REPORTS_DIR, SCENARIOS_DIR, SCENARIO_NAMES
+from .config import BASELINE_FEATURE_WEIGHTS, OUTPUTS_DIR, PROCESSED_DIR, REPORTS_DIR, SCENARIOS_DIR, SCENARIO_NAMES
 from .feature_extractor import compute_candidate_feature_row
 from .inverse_optimization import OBJECTIVE_FEATURES, learn_objective_weights
 from .ranker_evaluation import ranking_report_for_group
@@ -34,20 +34,8 @@ CANDIDATE_FILE_NAMES = [
     "candidate_05_expert_style.xlsx",
 ]
 
-RULE_WEIGHTS = {
-    "support_score": 0.22,
-    "weighted_support_score": 0.14,
-    "vehicle_fit_norm": 0.09,
-    "driver_fit_norm": 0.09,
-    "fairness_score": 0.10,
-    "fatigue_score": 0.09,
-    "vehicle_preservation_score": 0.08,
-    "other_handling_score": 0.08,
-    "expert_vehicle_match_rate": 0.04,
-    "expert_driver_match_rate": 0.04,
-    "expert_other_match_rate": 0.02,
-    "diversity_score": 0.01,
-}
+# The rule-based Ranker weights are the shared expert-designed baseline.
+RULE_WEIGHTS = BASELINE_FEATURE_WEIGHTS
 
 MODEL_FEATURES = [
     "unserved_count",

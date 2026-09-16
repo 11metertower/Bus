@@ -59,3 +59,22 @@ SCENARIO_NAMES = [
     "other_vehicle_conflict",
     "mixed_shortage",
 ]
+
+# Single source of truth for the expert-designed baseline weights over the 12
+# candidate-quality features.  Shared by the rule-based Ranker
+# (src.ranker.apply_rule_based_ranker) and by the inverse-optimization prior
+# (src.inverse_optimization.learn_objective_weights).  Keep these summing to 1.
+BASELINE_FEATURE_WEIGHTS = {
+    "support_score": 0.22,
+    "weighted_support_score": 0.16,
+    "vehicle_fit_norm": 0.09,
+    "driver_fit_norm": 0.09,
+    "fairness_score": 0.09,
+    "fatigue_score": 0.08,
+    "vehicle_preservation_score": 0.07,
+    "other_handling_score": 0.06,
+    "expert_vehicle_match_rate": 0.05,
+    "expert_driver_match_rate": 0.05,
+    "expert_other_match_rate": 0.03,
+    "diversity_score": 0.01,
+}
