@@ -5,3 +5,7 @@ __pycache__/
 *.pyc
 *.pyo
 .pytest_cache/
+
+# Generated pipeline artifacts (recreated on each run)
+outputs/
+reports/

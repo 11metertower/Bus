@@ -1,2 +1,0 @@
-﻿table,severity,issue_type,row_id,column,value,message
-all,OK,no_issue,,,,전처리 검증에서 치명적인 오류를 발견하지 못했습니다.
