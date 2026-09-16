@@ -312,7 +312,7 @@ def solve_candidate(
     for driver_id in active_driver_ids:
         terms = [int(cand["duration_min"]) * x_vars[i] for i, cand in enumerate(driver_candidates) if cand["driver_id"] == driver_id]
         var = model.NewIntVar(0, total_duration, f"driver_minutes_{driver_id}")
-        model.Add(var == sum(terms) if terms else 0)
+        model.Add(var == (sum(terms) if terms else 0))
         driver_minutes[driver_id] = var
     max_driver_minutes = model.NewIntVar(0, total_duration, "max_driver_minutes")
     if driver_minutes:
@@ -326,7 +326,7 @@ def solve_candidate(
         terms = [int(cand["duration_min"]) * x_vars[i] for i, cand in enumerate(driver_candidates) if cand["vehicle_id"] == vehicle_id]
         terms += [int(cand["duration_min"]) * y_vars[i] for i, cand in enumerate(other_candidates) if cand["vehicle_id"] == vehicle_id]
         var = model.NewIntVar(0, total_duration, f"vehicle_minutes_{vehicle_id}")
-        model.Add(var == sum(terms) if terms else 0)
+        model.Add(var == (sum(terms) if terms else 0))
         vehicle_minutes[vehicle_id] = var
     max_vehicle_minutes = model.NewIntVar(0, total_duration, "max_vehicle_minutes")
     if vehicle_minutes:
@@ -388,7 +388,6 @@ def solve_candidate(
             chosen_keys.add((cand["request_id"], cand["vehicle_id"], "OTHER"))
 
     unserved_reason_rows: List[Dict[str, Any]] = []
-    request_by_id = {str(r.get("request_id")): r for _, r in requests.iterrows()}
     for _, req in requests.iterrows():
         rid = str(req.get("request_id"))
         base = {
@@ -488,84 +487,6 @@ def solve_candidate(
         "_chosen_keys": chosen_keys,  # internal use; removed before exporting
     }
     return CandidateSolution(schedule, score_breakdown, unserved_reasons, hard_check)
-
-
-def check_hard_constraints(schedule: pd.DataFrame, tables: Dict[str, pd.DataFrame]) -> pd.DataFrame:
-    """Validate hard constraints on a generated schedule."""
-    tables = _clean_tables(tables)
-    vehicles = tables["vehicles"].copy()
-    drivers = tables["drivers"].copy()
-    vehicle_by_id = {as_key(v.get("vehicle_id")): v for _, v in vehicles.iterrows()}
-    driver_by_id = {str(d.get("driver_id")): d for _, d in drivers.iterrows()}
-    vehicle_availability_index = build_availability_index(tables["vehicle_availability"], "resource_id")
-    driver_availability_index = build_availability_index(tables["driver_availability"], "driver_id")
-
-    rows: List[Dict[str, Any]] = []
-    assigned = schedule[schedule["status"] == "ASSIGNED"].copy()
-
-    def add(issue_type: str, severity: str, message: str, request_id: str = ""):
-        rows.append({"issue_type": issue_type, "severity": severity, "request_id": request_id, "message": message})
-
-    # Other must never have a driver.
-    bad_other = assigned[(assigned["assignment_mode"] == "OTHER_DIRECT_DRIVER") & (assigned["assigned_driver_id"].fillna("") != "")]
-    for _, row in bad_other.iterrows():
-        add("OTHER_DRIVER_MISASSIGNED", "ERROR", "Other 직접운전 배차에 운전병이 배정되었습니다.", row.get("request_id"))
-
-    # Vehicle class, maintenance, availability.
-    for _, row in assigned.iterrows():
-        rid = row.get("request_id")
-        vid = as_key(row.get("assigned_vehicle_id"))
-        vehicle = vehicle_by_id.get(vid)
-        if vehicle is None:
-            add("UNKNOWN_VEHICLE", "ERROR", f"배정 차량 {vid}이 차량 목록에 없습니다.", rid)
-            continue
-        if str(vehicle.get("vehicle_class")) != str(row.get("required_vehicle_class")):
-            add("VEHICLE_CLASS_MISMATCH", "ERROR", f"요청 차종 {row.get('required_vehicle_class')}과 차량 차종 {vehicle.get('vehicle_class')}이 다릅니다.", rid)
-        if bool(vehicle.get("is_maintenance_or_unavailable", False)):
-            add("MAINTENANCE_VEHICLE_ASSIGNED", "ERROR", f"정비/입고/사용불가 의심 차량 {vid}이 배정되었습니다.", rid)
-        slots = request_slots(row.get("start_min"), row.get("end_min"))
-        if not is_resource_available(vid, slots, vehicle_availability_index):
-            add("VEHICLE_NOT_AVAILABLE", "ERROR", f"차량 {vid}이 요청 시간대에 전부 가용하지 않습니다.", rid)
-
-        if row.get("assignment_mode") == "DRIVER_REQUIRED":
-            did = str(row.get("assigned_driver_id"))
-            driver = driver_by_id.get(did)
-            if driver is None:
-                add("UNKNOWN_DRIVER", "ERROR", f"배정 운전병 {did}이 운전병 목록에 없습니다.", rid)
-            else:
-                # Recreate minimal request-like series for skill check.
-                request_like = pd.Series({"request_type": row.get("request_type")})
-                if not driver_has_required_skill(driver, vehicle, request_like):
-                    add("DRIVER_SKILL_MISMATCH", "ERROR", f"운전병 {did}의 기량이 요청 조건을 만족하지 않습니다.", rid)
-                if not is_resource_available(did, slots, driver_availability_index):
-                    add("DRIVER_NOT_AVAILABLE", "ERROR", f"운전병 {did}이 요청 시간대에 전부 가용하지 않습니다.", rid)
-
-    # Time overlaps: vehicle.
-    for vehicle_id, group in assigned.groupby("assigned_vehicle_id"):
-        if vehicle_id in ["", None] or pd.isna(vehicle_id):
-            continue
-        items = group.sort_values("start_min").to_dict("records")
-        for i in range(len(items)):
-            for j in range(i + 1, len(items)):
-                a, b = items[i], items[j]
-                if int(a["end_min"]) > int(b["start_min"]):
-                    add("VEHICLE_TIME_OVERLAP", "ERROR", f"차량 {vehicle_id}가 {a['request_id']}와 {b['request_id']}에 시간 중복 배정되었습니다.")
-
-    # Time overlaps: driver.  Other rows have empty driver id and are excluded.
-    driver_assigned = assigned[assigned["assignment_mode"] == "DRIVER_REQUIRED"]
-    for driver_id, group in driver_assigned.groupby("assigned_driver_id"):
-        if driver_id in ["", None] or pd.isna(driver_id):
-            continue
-        items = group.sort_values("start_min").to_dict("records")
-        for i in range(len(items)):
-            for j in range(i + 1, len(items)):
-                a, b = items[i], items[j]
-                if int(a["end_min"]) > int(b["start_min"]):
-                    add("DRIVER_TIME_OVERLAP", "ERROR", f"운전병 {driver_id}가 {a['request_id']}와 {b['request_id']}에 시간 중복 배정되었습니다.")
-
-    if not rows:
-        rows.append({"issue_type": "NO_HARD_CONSTRAINT_VIOLATION", "severity": "OK", "request_id": "", "message": "하드 제약 위반이 발견되지 않았습니다."})
-    return pd.DataFrame(rows)
 
 
 def solve_all_default_profiles(tables: Dict[str, pd.DataFrame]) -> List[CandidateSolution]:
