@@ -19,6 +19,7 @@ from typing import Dict, Iterable, List, Optional
 import pandas as pd
 from sklearn.ensemble import GradientBoostingRegressor, RandomForestRegressor
 from sklearn.metrics import mean_absolute_error, r2_score
+from sklearn.model_selection import KFold, cross_val_predict
 
 from .config import OUTPUTS_DIR, PROCESSED_DIR, REPORTS_DIR, SCENARIOS_DIR, SCENARIO_NAMES
 from .feature_extractor import compute_candidate_feature_row
@@ -141,12 +142,47 @@ def apply_rule_based_ranker(feature_df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
+def _build_estimator(model_type: str):
+    """Build the configured tree-based regressor used for CV and final fit."""
+    if model_type == "random_forest":
+        return RandomForestRegressor(n_estimators=150, random_state=42, min_samples_leaf=1)
+    return GradientBoostingRegressor(random_state=42, n_estimators=120, max_depth=2, learning_rate=0.05)
+
+
+def _cross_validated_metrics(estimator, X: pd.DataFrame, y: pd.Series) -> tuple[int, Optional[float], Optional[float]]:
+    """Out-of-sample MAE/R2 via K-fold CV, robust to tiny datasets.
+
+    Uses cross_val_predict so every row gets one held-out prediction, then
+    scores the pooled out-of-fold predictions.  This is more stable than a
+    single hold-out split on the small MVP dataset.  Returns
+    (n_splits, mae_cv, r2_cv); if there are too few rows for a meaningful
+    split, returns (0, None, None).
+    """
+    n = len(y)
+    if n < 4:
+        return 0, None, None
+    n_splits = min(5, n)
+    kf = KFold(n_splits=n_splits, shuffle=True, random_state=42)
+    try:
+        oof_pred = cross_val_predict(estimator, X, y, cv=kf)
+    except Exception:
+        return n_splits, None, None
+    mae_cv = float(mean_absolute_error(y, oof_pred))
+    try:
+        r2_cv = float(r2_score(y, oof_pred))
+    except Exception:
+        r2_cv = None
+    return n_splits, mae_cv, r2_cv
+
+
 def train_tree_ranker(feature_df: pd.DataFrame, model_type: str = "gradient_boosting") -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     """Train a small tree-based regressor and return scored data and reports.
 
-    Target is expert_similarity_score.  Because the MVP dataset is small, the
-    model is trained on the available candidates and evaluated in-sample.  The
-    report explicitly labels this as proof-of-concept evidence.
+    Target is expert_similarity_score.  The final model is fit on all available
+    candidates (to score the candidates we actually have), while K-fold
+    cross-validation provides out-of-sample MAE/R2 so generalization is not read
+    off the in-sample fit.  The report explicitly labels this as proof-of-concept
+    evidence given the small MVP dataset.
     """
     df = feature_df.copy()
     for col in MODEL_FEATURES:
@@ -163,16 +199,18 @@ def train_tree_ranker(feature_df: pd.DataFrame, model_type: str = "gradient_boos
         report = pd.DataFrame([{
             "model_type": "not_trained_insufficient_signal",
             "training_rows": len(df),
+            "cv_folds": 0,
             "mae_in_sample": None,
             "r2_in_sample": None,
+            "mae_cv": None,
+            "r2_cv": None,
             "note": "데이터가 너무 적거나 expert_similarity_score 변동이 작아, 규칙 기반 점수를 학습형 점수로 대체했습니다.",
         }])
         return df, importance, report
 
-    if model_type == "random_forest":
-        model = RandomForestRegressor(n_estimators=150, random_state=42, min_samples_leaf=1)
-    else:
-        model = GradientBoostingRegressor(random_state=42, n_estimators=120, max_depth=2, learning_rate=0.05)
+    model = _build_estimator(model_type)
+    # Out-of-sample estimate before fitting the final model on all data.
+    cv_folds, mae_cv, r2_cv = _cross_validated_metrics(model, X, y)
     model.fit(X, y)
     pred = model.predict(X)
     df["ml_ranker_score"] = pred
@@ -186,13 +224,20 @@ def train_tree_ranker(feature_df: pd.DataFrame, model_type: str = "gradient_boos
         r2 = float(r2_score(y, pred))
     except Exception:
         r2 = None
+    if cv_folds:
+        cv_note = f"{cv_folds}-fold 교차검증 out-of-sample 지표(mae_cv/r2_cv)를 함께 산출했습니다. 일반화 성능은 in-sample이 아닌 CV 기준으로 해석해야 합니다."
+    else:
+        cv_note = "행이 4개 미만이라 교차검증을 수행하지 못했습니다(mae_cv/r2_cv=None)."
     report = pd.DataFrame([{
         "model_type": model_type,
         "training_rows": len(df),
         "feature_count": len(MODEL_FEATURES),
+        "cv_folds": cv_folds,
         "mae_in_sample": float(mean_absolute_error(y, pred)),
         "r2_in_sample": r2,
-        "note": "MVP용 소규모 데이터의 in-sample 결과입니다. 생산 모델 성능으로 과장하지 않고 암묵지 학습 실증 개념으로 해석해야 합니다.",
+        "mae_cv": mae_cv,
+        "r2_cv": r2_cv,
+        "note": "MVP용 소규모 데이터 결과입니다. 생산 모델 성능으로 과장하지 않고 암묵지 학습 실증 개념으로 해석해야 합니다. " + cv_note,
     }])
     return df, importance, report
 
