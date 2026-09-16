@@ -134,7 +134,35 @@ outputs/ranker/all_scenarios/ranker_feature_importance.xlsx
 reports/evaluation/ranker_training_report.xlsx
 ```
 
-## 6. Streamlit 실행
+## 6. 테스트
+
+표준 `unittest` 기반 단위 테스트가 `tests/` 폴더에 있습니다. 프로젝트 루트에서 실행합니다.
+
+```bash
+python -m unittest discover -s tests
+```
+
+`pytest`가 설치돼 있으면 아래도 동일하게 동작합니다.
+
+```bash
+python -m pytest tests
+```
+
+테스트는 대부분 외부 데이터 파일 없이 인라인 데이터로 자체 완결되도록 작성되어, 전처리 이전에도 바로 실행할 수 있습니다. 커버리지 범위:
+
+- `tests/test_utils.py`: 시간/차량번호/차종/기량코드 파싱·정규화 헬퍼
+- `tests/test_other_handler.py`: `Other` 직접운전 판별과 driver_mode 컬럼 생성
+- `tests/test_feature_extractor.py`: 슬롯 계산(끝 시간 배타), 기량 판정, 차종 매칭, 가용성 인덱스, fit 점수
+- `tests/test_hard_constraint_checker.py`: 독립 하드 제약 검증기(차량 시간 중복, `Other` 오배정, 중복 행 등)
+- `tests/test_ranker_evaluation.py`: DCG/NDCG@5, Top-1 일치율
+- `tests/test_ranker.py`: 규칙 기반 Ranker, Tree-based Ranker, **K-fold 교차검증 out-of-sample 지표**
+- `tests/test_inverse_optimization.py`: 정규화, 가중치 합=1, 역최적화 산출표
+- `tests/test_config_weights.py`: 정본 가중치 테이블(`BASELINE_FEATURE_WEIGHTS`)이 규칙 Ranker·역최적화에서 **단일 출처**로 공유되는지 회귀 검증
+- `tests/test_optimizer.py`: 프로파일 구조 및 solve 결과의 하드 위반 0 검증
+
+> 참고: `tests/test_optimizer.py`는 OR-Tools(그리고 solve 통합 테스트는 `data/processed/` 입력)를 필요로 하며, 없는 환경에서는 해당 테스트만 자동으로 건너뜁니다(`skipUnless`). 나머지 테스트는 그대로 실행됩니다.
+
+## 7. Streamlit 실행
 
 ```bash
 streamlit run app.py
@@ -157,7 +185,7 @@ python -m streamlit run app.py
 7. 학습 전/학습 후 후보 순위 변화 확인
 8. 목적함수 가중치 보정표 확인
 
-## 7. 핵심 규칙
+## 8. 핵심 규칙
 
 - `Other`는 별도 직접운전자를 뜻합니다.
 - `Other` 배차에는 운전병을 배정하지 않습니다.
@@ -165,7 +193,7 @@ python -m streamlit run app.py
 - 운전병 기량, 운전병 스케줄, 피로도, 공정성 제약은 `Other`에 적용하지 않습니다.
 - 차량 가용성, 차량 시간 중복, 차종, 정비/입고, 탑승/적재량, 시간 제약은 그대로 적용합니다.
 
-## 8. v0.5.0에서 추가된 것
+## 9. v0.5.0에서 추가된 것
 
 - `src/ranker.py`: 후보 배차표 feature 추출, 규칙 기반 Ranker, Tree-based Ranker, 결과 저장
 - `src/inverse_optimization.py`: 간이 역최적화 목적함수 가중치 보정
@@ -175,7 +203,7 @@ python -m streamlit run app.py
 - `outputs/ranker/`: Ranker/역최적화 결과 저장 구조 추가
 - `reports/evaluation/ranker_training_report.xlsx`: 본선/기획서용 평가 리포트 생성
 
-## 9. 현재 단순화된 부분
+## 10. 현재 단순화된 부분
 
 - 부족 시나리오는 실제 부대 데이터를 재현한 것이 아니라 본선 시연용 가상 stress test입니다.
 - 정기배차 순번은 아직 별도 순번 데이터가 없어 config hook만 준비했습니다.
@@ -184,6 +212,6 @@ python -m streamlit run app.py
 - Ranker는 소규모 후보 데이터 기반의 실증이며, 실제 3년치 배차반장표가 들어오면 재학습 구조로 확장해야 합니다.
 - 역최적화는 완전한 수리계획 기반 bilevel inverse optimization이 아니라, feature-target 관계를 이용한 보수적 가중치 보정 방식입니다.
 
-## 10. 가상환경 주의
+## 11. 가상환경 주의
 
 `.venv` 폴더는 로컬 개발환경이며 zip에 포함하지 않습니다. 다른 컴퓨터에서는 `requirements.txt`로 재설치하세요.

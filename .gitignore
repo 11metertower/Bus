@@ -1,1 +1,7 @@
 .venv
+
+# Python caches / build artifacts
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
