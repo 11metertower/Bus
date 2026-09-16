@@ -1,0 +1,12 @@
+pandas
+numpy
+openpyxl
+xlsxwriter
+ortools
+scikit-learn
+streamlit
+plotly
+matplotlib
+lightgbm
+catboost
+shap
