@@ -170,7 +170,7 @@ st.markdown("### 2. 배차안을 만들어 보세요")
 run_clicked = st.button(
     "🤖 AI 배차 계획 만들기",
     type="primary",
-    use_container_width=True,
+    width="stretch",
     disabled=not processed_ready,
 )
 
@@ -246,7 +246,7 @@ if plan:
             only_unserved = st.checkbox("미지원 요청만 보기", key=f"unserved_{cid}")
             if only_unserved:
                 table = table[table["상태"] == STATUS_LABEL["UNSERVED"]]
-            st.dataframe(table, use_container_width=True, hide_index=True)
+            st.dataframe(table, width="stretch", hide_index=True)
 
             if not solution.unserved_reasons.empty:
                 with st.expander(f"⚠️ 미지원 {int(sb.get('unserved_count', 0))}건 — 왜 배차하지 못했나요?"):
@@ -259,7 +259,7 @@ if plan:
                             "해결 힌트": reasons.get("possible_relaxation", "").map(_clean_str),
                         }
                     )
-                    st.dataframe(show, use_container_width=True, hide_index=True)
+                    st.dataframe(show, width="stretch", hide_index=True)
 
 # --------------------------------------------------------------------------- #
 # 전문가 상세 · 데이터 관리 (접어 둠)
@@ -297,16 +297,16 @@ with st.expander("🔧 전문가 상세 · 데이터 관리", expanded=False):
         st.caption("소규모 MVP 데이터 기반의 실증 개념입니다. 완전한 학습 성능으로 해석하지 마세요.")
 
         st.markdown("학습 전/후 후보 순위 비교")
-        st.dataframe(rr["comparison"], use_container_width=True)
+        st.dataframe(rr["comparison"], width="stretch")
 
         st.markdown("역최적화 가중치 보정표")
-        st.dataframe(rr["learned_weights"], use_container_width=True)
+        st.dataframe(rr["learned_weights"], width="stretch")
 
         st.markdown("Tree 기반 Ranker feature importance")
-        st.dataframe(rr["feature_importance"], use_container_width=True)
+        st.dataframe(rr["feature_importance"], width="stretch")
 
         st.markdown("Ranker 학습 리포트")
-        st.dataframe(rr["training_report"], use_container_width=True)
+        st.dataframe(rr["training_report"], width="stretch")
 
     if plan:
         st.markdown("**생성된 파일 경로**")
