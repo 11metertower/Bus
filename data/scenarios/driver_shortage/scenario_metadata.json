@@ -1,0 +1,21 @@
+{
+  "scenario_name": "driver_shortage",
+  "description": "운전병 지원 배차 시간대에 전체 운전병 가용성을 일부 강제로 False 처리한 운전병 부족 시나리오입니다.",
+  "target_request_ids": [
+    "REQ_001",
+    "REQ_007",
+    "REQ_022",
+    "REQ_010",
+    "REQ_011"
+  ],
+  "manipulations": [
+    {
+      "action": "set_driver_availability_false",
+      "driver_count": 33,
+      "slot_count": 108,
+      "changed_cells": 3564
+    }
+  ],
+  "generated_from": "data/processed/*.csv",
+  "note": "가상/익명화된 본선 시연용 부족 시나리오입니다. 원본 데이터는 변경하지 않습니다."
+}

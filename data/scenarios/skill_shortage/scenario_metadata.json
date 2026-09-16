@@ -1,0 +1,21 @@
+{
+  "scenario_name": "skill_shortage",
+  "description": "목표 배차에 필요한 skill_large 기량을 전체 운전병에 대해 운전불가 수준으로 낮춘 기량 부족 시나리오입니다.",
+  "target_request_ids": [
+    "REQ_001"
+  ],
+  "manipulations": [
+    {
+      "action": "degrade_driver_skill",
+      "skill_slot": "skill_large",
+      "old_value_counts": {
+        "3": 17,
+        "1": 8,
+        "4": 8
+      },
+      "new_value": 4
+    }
+  ],
+  "generated_from": "data/processed/*.csv",
+  "note": "가상/익명화된 본선 시연용 부족 시나리오입니다. 원본 데이터는 변경하지 않습니다."
+}

@@ -1,0 +1,8 @@
+{
+  "scenario_name": "baseline",
+  "description": "전처리 결과를 그대로 사용하는 정상 시나리오입니다.",
+  "target_request_ids": [],
+  "manipulations": [],
+  "generated_from": "data/processed/*.csv",
+  "note": "가상/익명화된 본선 시연용 부족 시나리오입니다. 원본 데이터는 변경하지 않습니다."
+}

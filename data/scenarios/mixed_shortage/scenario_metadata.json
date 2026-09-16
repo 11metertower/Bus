@@ -1,0 +1,54 @@
+{
+  "scenario_name": "mixed_shortage",
+  "description": "차량 부족, 운전병 부족, 기량 부족, Other 차량 충돌을 함께 반영한 본선 시연용 복합 부족 시나리오입니다.",
+  "target_request_ids": [
+    "REQ_001",
+    "REQ_002",
+    "REQ_003",
+    "REQ_007",
+    "REQ_015",
+    "REQ_022",
+    "REQ_023",
+    "REQ_029"
+  ],
+  "manipulations": [
+    {
+      "action": "mixed_vehicle_shortage",
+      "vehicle_class": "대형 버스 (42인승)",
+      "target_request_ids": [
+        "REQ_015",
+        "REQ_023",
+        "REQ_029"
+      ],
+      "changed_cells": 372
+    },
+    {
+      "action": "mixed_driver_shortage",
+      "target_request_ids": [
+        "REQ_001",
+        "REQ_007",
+        "REQ_022"
+      ],
+      "changed_cells": 3564
+    },
+    {
+      "action": "mixed_skill_shortage",
+      "skill_slot": "skill_large",
+      "new_value": 4
+    },
+    {
+      "action": "mixed_other_vehicle_conflict",
+      "target_request_ids": [
+        "REQ_002",
+        "REQ_003"
+      ],
+      "vehicle_classes": [
+        "소형 버스(스타리아)",
+        "지프"
+      ],
+      "changed_cells": 324
+    }
+  ],
+  "generated_from": "data/processed/*.csv",
+  "note": "가상/익명화된 본선 시연용 부족 시나리오입니다. 원본 데이터는 변경하지 않습니다."
+}

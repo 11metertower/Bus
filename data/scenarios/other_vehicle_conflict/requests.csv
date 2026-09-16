@@ -1,0 +1,35 @@
+﻿request_id,request_type,requested_vehicle_id,required_vehicle_class,driver_raw,destination,requesting_unit,purpose,start_min,end_min,start_time,end_time,duration_min,priority_initial,source_table,is_other,requires_driver,driver_mode
+REQ_001,장거리 배차,,5톤 화물차,,경상북도(공항중학교),항공정비전대,트레일러 대여,480,1020,08:00,17:00,540.0,3,requests_raw,False,True,MILITARY_DRIVER_REQUIRED
+REQ_002,단거리 배차,,소형 버스(스타리아),Other,수원 화성,복지대대,요원 교육,480,1020,08:00,17:00,540.0,2,requests_raw,True,False,OTHER_DIRECT_DRIVER
+REQ_003,단거리 배차,,지프,Other,성남,공병대대,병사 인솔,480,1020,08:00,17:00,540.0,2,requests_raw,True,False,OTHER_DIRECT_DRIVER
+REQ_004,단거리 배차,,5톤 화물차,Other,평택,수송대대,중형 단거리 운전교육,480,690,08:00,11:30,210.0,2,requests_raw,True,False,OTHER_DIRECT_DRIVER
+REQ_005,단거리 배차,,5톤 화물차,Other,평택,수송대대,중형 단거리 운전교육,780,1020,13:00,17:00,240.0,2,requests_raw,True,False,OTHER_DIRECT_DRIVER
+REQ_006,영내 수시 배차,,1톤 원캡 트럭,Other,영내,수송대대,행정 업무,480,1020,08:00,17:00,540.0,1,requests_raw,True,False,OTHER_DIRECT_DRIVER
+REQ_007,영내 수시 배차,,5톤 급유차,,영내,보급대대,난방유 보급,480,1020,08:00,17:00,540.0,1,requests_raw,False,True,MILITARY_DRIVER_REQUIRED
+REQ_008,영내 수시 배차,,9톤 화물차,,영내,단본부,재활용품 반납,480,690,08:00,11:30,210.0,1,requests_raw,False,True,MILITARY_DRIVER_REQUIRED
+REQ_009,영내 수시 배차,,5톤 화물차,,영내,항공정비전대,재활용품 반납,540,690,09:00,11:30,150.0,1,requests_raw,False,True,MILITARY_DRIVER_REQUIRED
+REQ_010,영내 수시 배차,,5톤 화물차,,영내,부품정비대대,재활용품 반납,780,1020,13:00,17:00,240.0,1,requests_raw,False,True,MILITARY_DRIVER_REQUIRED
+REQ_011,영내 수시 배차,,9톤 화물차,,영내,수송대대,재활용품 반납,480,720,08:00,12:00,240.0,1,requests_raw,False,True,MILITARY_DRIVER_REQUIRED
+REQ_012,영내 수시 배차,,9톤 화물차,,영내,복지대대,재활용품 반납,810,870,13:30,14:30,60.0,1,requests_raw,False,True,MILITARY_DRIVER_REQUIRED
+REQ_013,영내 수시 배차,,9톤 화물차,,영내,복지대대,재활용품 반납,780,930,13:00,15:30,150.0,1,requests_raw,False,True,MILITARY_DRIVER_REQUIRED
+REQ_014,영내 수시 배차,,1톤 더블캡 트럭,,영내,수송대대,소형 영내 운전교육,480,690,08:00,11:30,210.0,1,requests_raw,False,True,MILITARY_DRIVER_REQUIRED
+REQ_015,영내 수시 배차,,대형 버스 (42인승),,영내,수송대대,대형 영내 운전교육,480,690,08:00,11:30,210.0,1,requests_raw,False,True,MILITARY_DRIVER_REQUIRED
+REQ_016,영내 정기 배차,,1톤 더블캡 트럭,,영내,복지대대,관사관리반 인원수송,460,480,07:40,08:00,20.0,1,requests_raw,False,True,MILITARY_DRIVER_REQUIRED
+REQ_017,영내 정기 배차,,1톤 더블캡 트럭,,영내,복지대대,관사관리반 인원수송,905,970,15:05,16:10,65.0,1,requests_raw,False,True,MILITARY_DRIVER_REQUIRED
+REQ_018,영내 정기 배차,,이동배식차,,영내,복지대대,이동배식,350,400,05:50,06:40,50.0,1,requests_raw,False,True,MILITARY_DRIVER_REQUIRED
+REQ_019,영내 정기 배차,,이동배식차,,영내,복지대대,이동배식,640,690,10:40,11:30,50.0,1,requests_raw,False,True,MILITARY_DRIVER_REQUIRED
+REQ_020,영내 정기 배차,,이동배식차,,영내,복지대대,이동배식,940,990,15:40,16:30,50.0,1,requests_raw,False,True,MILITARY_DRIVER_REQUIRED
+REQ_021,영내 정기 배차,,대형 버스 (42인승),,영내,화생방대대,출근 지원,455,490,07:35,08:10,35.0,1,requests_raw,False,True,MILITARY_DRIVER_REQUIRED
+REQ_022,영내 정기 배차,,1톤 원캡 트럭,,영내,보급대대,추진 보급,480,1020,08:00,17:00,540.0,1,requests_raw,False,True,MILITARY_DRIVER_REQUIRED
+REQ_023,영내 정기 배차,,대형 버스 (42인승),,영내,수송대대,출근 버스,420,470,07:00,07:50,50.0,1,requests_raw,False,True,MILITARY_DRIVER_REQUIRED
+REQ_024,영내 정기 배차,,대형 버스 (42인승),,영내,수송대대,셔틀 버스,540,565,09:00,09:25,25.0,1,requests_raw,False,True,MILITARY_DRIVER_REQUIRED
+REQ_025,영내 정기 배차,,대형 버스 (42인승),,영내,수송대대,셔틀 버스,680,702,11:20,11:42,22.0,1,requests_raw,False,True,MILITARY_DRIVER_REQUIRED
+REQ_026,영내 정기 배차,,대형 버스 (42인승),,영내,수송대대,셔틀 버스,750,772,12:30,12:52,22.0,1,requests_raw,False,True,MILITARY_DRIVER_REQUIRED
+REQ_027,영내 정기 배차,,대형 버스 (42인승),,영내,수송대대,셔틀 버스,900,925,15:00,15:25,25.0,1,requests_raw,False,True,MILITARY_DRIVER_REQUIRED
+REQ_028,영내 정기 배차,,대형 버스 (42인승),,영내,수송대대,셔틀 버스,960,985,16:00,16:25,25.0,1,requests_raw,False,True,MILITARY_DRIVER_REQUIRED
+REQ_029,영내 정기 배차,,대형 버스 (42인승),,영내,수송대대,퇴근 버스,1020,1070,17:00,17:50,50.0,1,requests_raw,False,True,MILITARY_DRIVER_REQUIRED
+REQ_030,영내 정기 배차,,대형 버스 (42인승),,영내,수송대대,셔틀 버스 (반대 방향),690,720,11:30,12:00,30.0,1,requests_raw,False,True,MILITARY_DRIVER_REQUIRED
+REQ_031,영내 정기 배차,,대형 버스 (42인승),,영내,수송대대,셔틀 버스 (반대 방향),760,780,12:40,13:00,20.0,1,requests_raw,False,True,MILITARY_DRIVER_REQUIRED
+REQ_032,영내 정기 배차,,대형 버스 (42인승),,영내,수송대대,귀영 수송,1210,1230,20:10,20:30,20.0,1,requests_raw,False,True,MILITARY_DRIVER_REQUIRED
+REQ_033,영내 정기 배차,,대형 버스 (42인승),,영내,수송대대,귀영 수송,1300,1320,21:40,22:00,20.0,1,requests_raw,False,True,MILITARY_DRIVER_REQUIRED
+REQ_034,영내 정기 배차,,1톤 더블캡 트럭,,수원,인사행정처,체송,800,900,13:20,15:00,100.0,1,requests_raw,False,True,MILITARY_DRIVER_REQUIRED

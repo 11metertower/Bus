@@ -1,0 +1,31 @@
+{
+  "scenario_name": "other_vehicle_conflict",
+  "description": "Other 직접운전 배차는 운전병이 필요 없지만 차량 자원이 부족하여 미지원되는 상황을 보여주는 시나리오입니다.",
+  "target_request_ids": [
+    "REQ_002",
+    "REQ_003",
+    "REQ_006"
+  ],
+  "manipulations": [
+    {
+      "action": "set_other_compatible_vehicles_unavailable",
+      "vehicle_classes": [
+        "소형 버스(스타리아)",
+        "지프",
+        "1톤 원캡 트럭"
+      ],
+      "vehicle_ids": [
+        "1606",
+        "2161",
+        "2165",
+        "2166",
+        "7039",
+        "7054"
+      ],
+      "slot_count": 108,
+      "changed_cells": 648
+    }
+  ],
+  "generated_from": "data/processed/*.csv",
+  "note": "가상/익명화된 본선 시연용 부족 시나리오입니다. 원본 데이터는 변경하지 않습니다."
+}
